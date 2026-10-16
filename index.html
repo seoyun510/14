@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>조선주니어 동물의 숲 Sleep Journey</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+        :root {
+            --theme-bg: linear-gradient(180deg, #71c062 0%, #5ca14f 100%);
+            --theme-border: #437038;
+            --theme-shadow: #2a4a23;
+            --ac-dialog-bg: #fffbf0;
+            --ac-wood-border: #795548;
+            --ac-brown: #5d4037;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Jua', 'Pretendard', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #1a2332;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--ac-brown);
+        }
+
+        /* 모바일 프레임 */
+        .mobile-container {
+            width: 100%;
+            max-width: 412px;
+            height: 100vh;
+            max-height: 840px;
+            background: #0f172a;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        @media (min-width: 420px) {
+            .mobile-container {
+                border-radius: 36px;
+                height: 800px;
+                border: 6px solid #4e342e;
+            }
+        }
+
+        /* 헤더 */
+        .header {
+            padding: 16px 20px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .brand-title {
+            font-size: 15px;
+            color: #ffe082;
+            text-shadow: 2px 2px 0px #5d4037;
+        }
+
+        .room-tag {
+            background: #fff8e1;
+            color: #5d4037;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 2px solid #8d6e63;
+            box-shadow: 0 3px 0 #5d4037;
+        }
+
+        .content {
+            flex: 1;
+            padding: 10px 16px 80px;
+            overflow-y: auto;
+        }
+
+        .tab-section {
+            display: none;
+        }
+        .tab-section.active {
+            display: block;
+        }
+
+        /* 테마 선택 단일 카드 */
+        .theme-selector-card {
+            background: #fff8e1;
+            border: 4px solid #8d6e63;
+            border-radius: 24px;
+            padding: 14px;
+            box-shadow: 0 6px 0 #4e342e;
+            margin-bottom: 16px;
+        }
+
+        .theme-title {
+            font-size: 12px;
+            color: #5d4037;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .theme-btn {
+            background: #ffffff;
+            border: 3px solid #8d6e63;
+            border-radius: 18px;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #5d4037;
+            transition: all 0.2s;
+        }
+
+        .theme-btn.active {
+            background: #ffe082;
+            border-color: #5d4037;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #5d4037;
+        }
+
+        .theme-btn .icon { font-size: 24px; }
+        .theme-btn .name { font-size: 11px; margin-top: 4px; color: #5d4037; }
+        .theme-btn .tag { font-size: 9px; color: #8d6e63; margin-top: 2px; }
+
+        /* 메인 무대 카드 */
+        .main-card {
+            background: var(--theme-bg);
+            border: 4px solid var(--theme-border);
+            border-radius: 28px;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 8px 0 var(--theme-shadow);
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .badge-title {
+            background: rgba(15, 23, 42, 0.4);
+            color: #fffde7;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        .char-stage {
+            width: 180px;
+            height: 130px;
+            margin: 5px auto;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .char-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 6px 4px rgba(0,0,0,0.25));
+            transition: transform 0.15s;
+        }
+
+        .char-stage:active .char-svg {
+            transform: scale(0.9) rotate(-4deg);
+        }
+
+        /* 동물의 숲 대화 상자 */
+        .ac-dialog {
+            background-color: var(--ac-dialog-bg);
+            border: 4px solid var(--ac-wood-border);
+            border-radius: 20px;
+            padding: 16px;
+            color: #4e342e;
+            position: relative;
+            text-align: left;
+            box-shadow: 0 6px 0 #4e342e;
+            min-height: 100px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .ac-name-tag {
+            position: absolute;
+            top: -15px;
+            left: 16px;
+            background: #8d6e63;
+            color: #ffffff;
+            font-size: 12px;
+            padding: 3px 14px;
+            border-radius: 12px;
+            border: 2px solid #4e342e;
+            box-shadow: 0 2px 0 #3e2723;
+        }
+
+        .ac-text {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+
+        .next-arrow {
+            text-align: right;
+            font-size: 11px;
+            color: #a1887f;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* 자장가 플레이어 */
+        .player-card {
+            background: #fff8e1;
+            border: 4px solid #8d6e63;
+            border-radius: 22px;
+            padding: 14px 18px;
+            box-shadow: 0 6px 0 #4e342e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-play {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #fdd835;
+            border: 3px solid #5d4037;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #5d4037;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5d4037;
+        }
+
+        .btn-action {
+            width: 100%;
+            background: #ffe082;
+            border: 3px solid #5d4037;
+            padding: 12px;
+            border-radius: 18px;
+            font-size: 14px;
+            color: #5d4037;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #5d4037;
+            margin-top: 10px;
+        }
+
+        /* 3단계 네비게이션 */
+        .nav-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: #4e342e;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 3px solid #3e2723;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #d7ccc8;
+            font-size: 10px;
+            cursor: pointer;
+            width: 33.33%;
+        }
+
+        .nav-item.active {
+            color: #ffe082;
+            font-weight: bold;
+        }
+
+        .nav-item .icon { font-size: 18px; margin-bottom: 2px; }
+
+        /* 수집관 카드 레이아웃 */
+        .collect-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .collect-card {
+            background: #fff8e1;
+            border: 3px solid #8d6e63;
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 0 #5d4037;
+        }
+
+        .collect-card.locked {
+            background: #efebe9;
+            border-color: #a1887f;
+            box-shadow: 0 4px 0 #8d6e63;
+        }
+
+        .collect-card.locked .mystery-icon {
+            font-size: 36px;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container">
+    <div class="header">
+        <span class="brand-title">🍃 조선주니어 마을</span>
+        <span class="room-tag">802호 투숙중</span>
+    </div>
+
+    <div class="content">
+        <!-- 테마 선택 영역 -->
+        <div class="theme-selector-card">
+            <div class="theme-title">⭐ 머무를 마을을 선택하세요 (단 1개 전용) ⭐</div>
+            <div class="theme-grid">
+                <div class="theme-btn active" id="btn-forest" onclick="selectSingleTheme('forest')">
+                    <div class="icon">🐘</div>
+                    <div class="name">코리</div>
+                    <div class="tag">🌲 숲속 주민</div>
+                </div>
+                <div class="theme-btn" id="btn-sky" onclick="selectSingleTheme('sky')">
+                    <div class="icon">🦜</div>
+                    <div class="name">비노</div>
+                    <div class="tag">☁️ 하늘 주민</div>
+                </div>
+                <div class="theme-btn" id="btn-ocean" onclick="selectSingleTheme('ocean')">
+                    <div class="icon">🐳</div>
+                    <div class="name">고고</div>
+                    <div class="tag">🌊 바다 주민</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 캐릭터 이야기 탭 -->
+        <div id="tab1" class="tab-section active">
+            <div class="main-card">
+                <span class="badge-title" id="story-badge">📖 숲속 주민 이야기</span>
+                <div class="char-stage" onclick="speakStory()">
+                    <div id="story-svg-container" style="width:100%; height:100%;"></div>
+                </div>
+                <div class="ac-dialog" onclick="speakStory()">
+                    <div id="story-name" class="ac-name-tag">🐘 코리 이야기</div>
+                    <div id="story-text" class="ac-text">터치해서 친구의 스토리를 들어보세요!</div>
+                    <div class="next-arrow">▼ 터치해서 계속 읽기</div>
+                </div>
+            </div>
+            <button class="btn-action" onclick="switchTab(2)">🌙 선택한 주민과 자장가 들으러 가기 ▶</button>
+        </div>
+
+        <!-- 2. 취침 대화 & 자장가 탭 -->
+        <div id="tab2" class="tab-section">
+            <div class="main-card">
+                <span class="badge-title" id="sleep-badge">🌙 숲속 마을 수면 타임</span>
+                <div class="char-stage" onclick="speakSleepDialog()">
+                    <div id="sleep-svg-container" style="width:100%; height:100%;"></div>
+                </div>
+                <div class="ac-dialog" onclick="speakSleepDialog()">
+                    <div id="sleep-name" class="ac-name-tag">🐘 코리</div>
+                    <div id="sleep-text" class="ac-text">터치하면 잠이 솔솔 오는 이야기가 시작돼요...</div>
+                    <div class="next-arrow">▼ 터치해서 계속 읽기</div>
+                </div>
+            </div>
+
+            <div class="player-card">
+                <div>
+                    <span style="font-size:10px; background:#8d6e63; color:#fff; padding:2px 8px; border-radius:8px;" id="music-tag">🌲 숲속 주민 전용</span>
+                    <div id="music-title" style="font-size:14px; margin-top:3px; color:#5d4037;">🌲 코리의 숲속 포근한 오르골</div>
+                    <div id="music-sub" style="font-size:10px; color:#8d6e63; margin-top:2px;">C 메이저 - 포근한 숲속 멜로디</div>
+                </div>
+                <button class="btn-play" id="playBtn" onclick="toggleLullaby()">▶</button>
+            </div>
+        </div>
+
+        <!-- 3. 굿모닝 수집관 탭 -->
+        <div id="tab3" class="tab-section">
+            <div style="background:#fff8e1; border:4px solid #8d6e63; border-radius:24px; padding:16px; text-align:center; box-shadow:0 6px 0 #4e342e;">
+                <div style="font-size:32px; margin-bottom:4px;">☀️</div>
+                <div style="font-size:15px; color:#5d4037; margin-bottom:4px;" id="collection-title">🌲 숲속 주민 굿모닝 수집관</div>
+                <div style="font-size:11px; color:#8d6e63; line-height:1.5;">
+                    오늘 밤 포근하게 잠들면,<br><b style="color:#5d4037;">다음 날 아침 비밀 친구</b>를 만날 수 있어요!
+                </div>
+            </div>
+
+            <!-- 오늘 대표 캐릭터 1개 + 아직 만나지 못한 비밀 친구 단일 카드 1개 -->
+            <div class="collect-container" id="collect-list"></div>
+        </div>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="nav-bar">
+        <div class="nav-item active" id="nav1" onclick="switchTab(1)">
+            <span class="icon">📖</span>
+            <span>주민 이야기</span>
+        </div>
+        <div class="nav-item" id="nav2" onclick="switchTab(2)">
+            <span class="icon">🌙</span>
+            <span>취침 대화 & 자장가</span>
+        </div>
+        <div class="nav-item" id="nav3" onclick="switchTab(3)">
+            <span class="icon">☀️</span>
+            <span>굿모닝 수집관</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 캐릭터 SVG
+    const svgData = {
+        cori: `<svg class="char-svg" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 20 100 Q 15 40 80 40 L 150 40 Q 180 40 170 100 Q 150 120 80 120 Z" fill="#20b2aa"/>
+            <path d="M 40 85 Q 10 80 20 65 Q 35 55 50 70" fill="#20b2aa" stroke="#0e7a75" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="75" cy="65" r="12" fill="white"/>
+            <circle cx="75" cy="65" r="5" fill="#0e7a75"/>
+            <path d="M 105 60 L 125 60 L 125 80 L 105 80 Z" fill="#20b2aa" stroke="#0e7a75" stroke-width="4" stroke-linejoin="round"/>
+            <rect x="65" y="115" width="12" height="18" rx="6" fill="#20b2aa" stroke="#0e7a75" stroke-width="3"/>
+            <rect x="125" y="115" width="12" height="18" rx="6" fill="#20b2aa" stroke="#0e7a75" stroke-width="3"/>
+        </svg>`,
+        bino: `<svg class="char-svg" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 80 40 C 60 40 60 80 60 100 C 60 120 120 120 120 100 C 120 60 100 40 80 40 Z" fill="#6a5acd"/>
+            <path d="M 80 40 Q 60 25 75 20 Q 90 25 80 40" fill="#6a5acd"/>
+            <path d="M 105 55 L 120 60 L 105 68 Z" fill="#ffa500"/>
+            <circle cx="95" cy="55" r="7" fill="white"/>
+            <circle cx="95" cy="55" r="3" fill="#222"/>
+            <path d="M 75 70 L 95 70 L 95 90 L 75 90 Z" fill="#6a5acd" stroke="#483d8b" stroke-width="3"/>
+            <path d="M 50 105 Q 40 100 35 110" stroke="#ff6b6b" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 48 112 Q 38 110 35 120" stroke="#4ecdc4" stroke-width="5" stroke-linecap="round"/>
+        </svg>`,
+        gogo: `<svg class="char-svg" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 40 80 Q 40 30 110 30 Q 170 30 170 80 Q 170 100 150 100 L 40 100 Z" fill="#808a9d"/>
+            <path d="M 160 80 Q 190 75 185 95 Q 165 90 155 85" fill="#808a9d"/>
+            <circle cx="75" cy="65" r="9" fill="white"/>
+            <circle cx="75" cy="65" r="4" fill="#222"/>
+            <path d="M 100 30 Q 100 15 108 10 Q 115 15 110 30" stroke="#ff85a2" stroke-width="3" fill="none"/>
+            <path d="M 30 100 Q 100 90 180 100 Q 100 110 30 100" fill="#48cae4" opacity="0.6"/>
+        </svg>`
+    };
+
+    // 테마별 독립 데이터
+    const themeData = {
+        forest: {
+            key: 'cori',
+            title: '🌲 숲속 주민 코리',
+            bg: 'linear-gradient(180deg, #71c062 0%, #5ca14f 100%)',
+            border: '#437038',
+            shadow: '#2a4a23',
+            storyTitle: "🐘 숲속 주민 코리 이야기",
+            stories: [
+                "친구를 만나면 길쭉한 코를 흔들어 인사하는 숲속 주민 코리야!",
+                "코리는 푸르른 숲속 마을의 다정한 길잡이란다.",
+                "길쭉한 코로 숲속 열매를 건네며 신나게 인사를 나누지!"
+            ],
+            sleepTitle: "🐘 숲속 주민 코리",
+            sleeps: [
+                "숲속 나무들이 살랑살랑 수면 자장가를 불러주고 있어.",
+                "달님이 나뭇가지 사이로 포근한 빛을 내리고 있단다.",
+                "스르륵... 코를 숙이고 깊고 예쁜 숲속 꿈을 꾸자."
+            ],
+            tag: "🌲 숲속 전용 자장가",
+            musicTitle: "🌲 코리의 숲속 포근한 오르골",
+            musicSub: "C 메이저 - 따뜻한 숲속 울림",
+            notes: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25],
+            speed: 850,
+            unlockedIcon: '🐘',
+            unlockedName: '숲속 코리'
+        },
+        sky: {
+            key: 'bino',
+            title: '☁️ 하늘 주민 비노',
+            bg: 'linear-gradient(180deg, #7986cb 0%, #5c6bc0 100%)',
+            border: '#3f51b5',
+            shadow: '#283593',
+            storyTitle: "🦜 하늘 주민 비노 이야기",
+            stories: [
+                "친구들의 기쁜 소식을 전해주는 하늘 주민 비노야!",
+                "비노는 솜사탕 구름 위를 날아다니며 편지를 전달해.",
+                "알록달록 예쁜 깃털로 하늘을 물들이는 신나는 날들을 보내지!"
+            ],
+            sleepTitle: "🦜 하늘 주민 비노",
+            sleeps: [
+                "바람도 잠든 밤, 밤하늘 편지함이 조용히 닫혔단다.",
+                "별빛들이 퐁퐁 떨어지는 구름 위로 날아가 볼까?",
+                "폭신폭신한 솜사탕 구름 베개를 베고 잘 자~"
+            ],
+            tag: "☁️ 하늘 전용 자장가",
+            musicTitle: "☁️ 비노의 구름 반짝이는 자장가",
+            musicSub: "F 메이저 - 높은 별빛 오르골 음계",
+            notes: [349.23, 392.00, 440.00, 523.25, 587.33, 698.46],
+            speed: 650,
+            unlockedIcon: '🦜',
+            unlockedName: '하늘 비노'
+        },
+        ocean: {
+            key: 'gogo',
+            title: '🌊 바다 주민 고고',
+            bg: 'linear-gradient(180deg, #4dd0e1 0%, #26c6da 100%)',
+            border: '#0097a7',
+            shadow: '#006064',
+            storyTitle: "🐳 바다 주민 고고 이야기",
+            stories: [
+                "마음이 여리고 친절한 바다 주민 아기 고래 고고야.",
+                "고고는 넓고 푸른 밤바다를 조용히 수영하는 친구야.",
+                "등 위에서 뿜어져 나오는 신기한 분수로 무지개를 만들곤 해!"
+            ],
+            sleepTitle: "🐳 바다 주민 고고",
+            sleeps: [
+                "밤바다가 잔잔해지며 파도 자장가가 들려오고 있어.",
+                "고고의 등 위는 아주 따뜻하단다. 가만히 기대어보렴.",
+                "깊고 푸른 바다 속에서 포근한 꿈을 꾸길..."
+            ],
+            tag: "🌊 바다 전용 자장가",
+            musicTitle: "🌊 고고의 깊은 바다 느린 자장가",
+            musicSub: "G 메이저 - 느리고 울림이 긴 자장가",
+            notes: [196.00, 246.94, 293.66, 329.63, 392.00],
+            speed: 1100,
+            unlockedIcon: '🐳',
+            unlockedName: '바다 고고'
+        }
+    };
+
+    let currentThemeKey = 'forest';
+    let storyIdx = 0;
+    let sleepIdx = 0;
+    let isTyping = false;
+
+    let audioCtx = null;
+    let isPlaying = false;
+    let musicTimer = null;
+
+    function playNote(freq, duration = 1.8) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = currentThemeKey === 'ocean' ? 'sine' : 'triangle'; 
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playACBeep() {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        const pitchBase = currentThemeKey === 'sky' ? 500 : (currentThemeKey === 'ocean' ? 250 : 380);
+        osc.frequency.setValueAtTime(pitchBase + Math.random() * 180, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    }
+
+    function startLullabyEngine() {
+        if (musicTimer) clearInterval(musicTimer);
+        const data = themeData[currentThemeKey];
+        musicTimer = setInterval(() => {
+            const randomNote = data.notes[Math.floor(Math.random() * data.notes.length)];
+            playNote(randomNote, currentThemeKey === 'ocean' ? 2.5 : 1.6);
+        }, data.speed);
+    }
+
+    function toggleLullaby() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const btn = document.getElementById('playBtn');
+        if (isPlaying) {
+            isPlaying = false;
+            clearInterval(musicTimer);
+            btn.innerText = "▶";
+        } else {
+            isPlaying = true;
+            btn.innerText = "⏸";
+            startLullabyEngine();
+        }
+    }
+
+    function typeText(text, targetId) {
+        isTyping = true;
+        const target = document.getElementById(targetId);
+        target.innerText = '';
+        let i = 0;
+
+        const interval = setInterval(() => {
+            if (i < text.length) {
+                target.innerText += text.charAt(i);
+                if (text.charAt(i) !== ' ') playACBeep();
+                i++;
+            } else {
+                clearInterval(interval);
+                isTyping = false;
+            }
+        }, 45);
+    }
+
+    /* 단일 테마 변경 및 전용 수집관 렌더링 */
+    function selectSingleTheme(themeKey) {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        currentThemeKey = themeKey;
+        storyIdx = 0;
+        sleepIdx = 0;
+
+        const data = themeData[themeKey];
+
+        document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-${themeKey}`).classList.add('active');
+
+        document.documentElement.style.setProperty('--theme-bg', data.bg);
+        document.documentElement.style.setProperty('--theme-border', data.border);
+        document.documentElement.style.setProperty('--theme-shadow', data.shadow);
+
+        // 1. 스토리 탭
+        document.getElementById('story-badge').innerText = `📖 ${data.title}`;
+        document.getElementById('story-svg-container').innerHTML = svgData[data.key];
+        document.getElementById('story-name').innerText = data.storyTitle;
+        typeText(data.stories[0], 'story-text');
+
+        // 2. 수면 탭
+        document.getElementById('sleep-badge').innerText = `🌙 ${data.title} 수면 타임`;
+        document.getElementById('sleep-svg-container').innerHTML = svgData[data.key];
+        document.getElementById('sleep-name').innerText = data.sleepTitle;
+        document.getElementById('music-tag').innerText = data.tag;
+        document.getElementById('music-title').innerText = data.musicTitle;
+        document.getElementById('music-sub').innerText = data.musicSub;
+        typeText(data.sleeps[0], 'sleep-text');
+
+        // 3. 단일 미스터리 수집관 카드 렌더링 (여러 개 반복 제거)
+        document.getElementById('collection-title').innerText = `${data.title} 굿모닝 수집관`;
+        
+        const listContainer = document.getElementById('collect-list');
+        listContainer.innerHTML = `
+            <!-- 오늘 만난 친구 -->
+            <div class="collect-card">
+                <div style="font-size: 38px;">${data.unlockedIcon}</div>
+                <div style="font-size: 13px; color: #5d4037; margin-top: 4px; font-weight: bold;">${data.unlockedName}</div>
+                <div style="font-size: 10px; color: #388e3c; margin-top: 2px;">[오늘의 대표 친구]</div>
+            </div>
+            
+            <!-- 아직 만나지 못한 비밀 친구 (단 1개만 표시) -->
+            <div class="collect-card locked">
+                <div class="mystery-icon">❓</div>
+                <div style="font-size: 13px; color: #5d4037; margin-top: 6px; font-weight: bold;">아침이 되면 만날 수 있어요!</div>
+                <div style="font-size: 10px; color: #8d6e63; margin-top: 3px;">밤 사이 포근하게 잠들고 아침에 새로운 친구를 만나보세요</div>
+            </div>
+        `;
+
+        if (isPlaying) startLullabyEngine();
+    }
+
+    function speakStory() {
+        if (isTyping) return;
+        const data = themeData[currentThemeKey];
+        storyIdx = (storyIdx + 1) % data.stories.length;
+        typeText(data.stories[storyIdx], 'story-text');
+    }
+
+    function speakSleepDialog() {
+        if (isTyping) return;
+        const data = themeData[currentThemeKey];
+        sleepIdx = (sleepIdx + 1) % data.sleeps.length;
+        typeText(data.sleeps[sleepIdx], 'sleep-text');
+    }
+
+    function switchTab(tabNum) {
+        document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.nav-bar .nav-item').forEach(nav => nav.classList.remove('active'));
+
+        document.getElementById(`tab${tabNum}`).classList.add('active');
+        document.getElementById(`nav${tabNum}`).classList.add('active');
+    }
+
+    window.onload = () => {
+        selectSingleTheme('forest');
+    };
+</script>
+
+</body>
+</html>
